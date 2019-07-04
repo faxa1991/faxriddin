@@ -17,6 +17,7 @@ $.extend($.fn, {
 
 		// if nothing is selected, return nothing; can't chain anyway
 		if ( !this.length ) {
+			
 			if ( options && options.debug && window.console ) {
 				console.warn( "Nothing selected, can't validate, returning nothing." );
 			}
@@ -35,9 +36,11 @@ $.extend($.fn, {
 		validator = new $.validator( options, this[0] );
 		$.data( this[0], "validator", validator );
 
-		if ( validator.settings.onsubmit ) {
-
+		if ( validator.settings.onsubmit ) 
+		{
+			
 			this.validateDelegate( ":submit", "click", function( event ) {
+				
 				if ( validator.settings.submitHandler ) {
 					validator.submitButton = event.target;
 				}
@@ -54,6 +57,7 @@ $.extend($.fn, {
 
 			// validate the form on submit
 			this.submit( function( event ) {
+				
 				if ( validator.settings.debug ) {
 					// prevent form submit to be able to see console output
 					event.preventDefault();
@@ -103,6 +107,7 @@ $.extend($.fn, {
 			var valid = true;
 			var validator = $(this[0].form).validate();
 			this.each(function() {
+				
 				valid = valid && validator.element(this);
 			});
 			return valid;
@@ -210,7 +215,7 @@ $.validator.format = function( source, params ) {
 };
 
 $.extend($.validator, {
-
+	
 	defaults: {
 		messages: {},
 		groups: {},
@@ -258,6 +263,7 @@ $.extend($.validator, {
 			}
 		},
 		highlight: function( element, errorClass, validClass ) {
+			
 			if ( element.type === "radio" ) {
 				this.findByName(element.name).addClass(errorClass).removeClass(validClass);
 			} else {

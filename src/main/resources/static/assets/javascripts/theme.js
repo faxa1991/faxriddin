@@ -3929,7 +3929,7 @@ window.theme = {};
 		$.extend(true, $.fn.dataTable.defaults, {
 			sDom: "<'row datatables-header form-inline'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>r><'table-responsive't><'row datatables-footer'<'col-sm-12 col-md-6'i><'col-sm-12 col-md-6'p>>",
 			oLanguage: {
-				sLengthMenu: '_MENU_ records per page',
+				sLengthMenu: '_MENU_  Записей на странице ',
 				sProcessing: '<i class="fa fa-spinner fa-spin"></i> Loading'
 			},
 			fnInitComplete: function( settings, json ) {
@@ -3938,6 +3938,7 @@ window.theme = {};
 					$('.dataTables_length select', settings.nTableWrapper).select2({
 						minimumResultsForSearch: -1
 					});
+					
 				}
 
 				var options = $( 'table', settings.nTableWrapper ).data( 'plugin-options' ) || {};
@@ -3947,7 +3948,7 @@ window.theme = {};
 
 				$search
 					.attr({
-						placeholder: typeof options.searchPlaceholder !== 'undefined' ? options.searchPlaceholder : 'Search'
+						placeholder: typeof options.searchPlaceholder !== 'undefined' ? options.searchPlaceholder : 'Поиск'
 					})
 					.addClass('form-control');
 

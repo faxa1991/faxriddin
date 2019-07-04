@@ -42,6 +42,7 @@
       if (this.showWidgetOnAddonClick && (this.$element.parent().hasClass('input-append') || this.$element.parent().hasClass('input-prepend'))) {
         this.$element.parent('.input-append, .input-prepend').find('.add-on').on({
           'click.timepicker': $.proxy(this.showWidget, this)
+         
         });
         this.$element.on({
           'focus.timepicker': $.proxy(this.highlightUnit, this),
@@ -49,6 +50,7 @@
           'keydown.timepicker': $.proxy(this.elementKeydown, this),
           'blur.timepicker': $.proxy(this.blurElement, this),
           'mousewheel.timepicker DOMMouseScroll.timepicker': $.proxy(this.mousewheel, this)
+          
         });
       } else {
         if (this.template) {
@@ -1086,7 +1088,7 @@
     secondStep: 15,
     showSeconds: false,
     showInputs: true,
-    showMeridian: true,
+    showMeridian: false,
     template: 'dropdown',
     appendWidgetTo: 'body',
     showWidgetOnAddonClick: true
