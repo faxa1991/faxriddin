@@ -1,0 +1,76 @@
+before_script:
+  ##
+  ## Install ssh-agent if not already installed, it is required by Docker.
+  ## (change apt-get to yum if you use an RPM-based image)
+  ##
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+
+  ##
+  ## Run ssh-agent (inside the build environment)
+  ##
+  - eval $(ssh-agent -s)
+
+  ##
+  ## Add the SSH key stored in SSH_PRIVATE_KEY variable to the agent store
+  ## We're using tr to fix line endings which makes ed25519 keys work
+  ## without extra base64 encoding.
+  ## https://gitlab.com/gitlab-examples/ssh-private-key/issues/1#note_48526556
+  ##
+  - mkdir -p ~/.ssh
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > ~/.ssh/id_rsa
+  #- ssh-add <(echo "$SSH_PRIVATE_KEY" | base64 -d)
+
+  ##
+  ## Create the SSH directory and give it the right permissions
+  ##
+  - mkdir -p ~/.ssh
+  - chmod 700 ~/.ssh
+  #- sudo echo "172.26.0.51 gitlab.lineapps.org" >> /etc/hosts
+
+  ##
+  ## Optionally, if you will be using any Git commands, set the user name and
+  ## and email.
+  ##
+  #- git config --global user.email "user@example.com"
+  #- git config --global user.name "User name"
+
+image: maven:fix
+
+stages:
+  - build
+#  - test
+  - DEV deploy
+  - UAT deploy
+
+
+variables:
+#  MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
+   MAVEN_CLI_OPTS: ""
+   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+#   CI_BUILD_TOKEN: "8XJxVu6j_VUqniDNwij5"
+#   CI_DEBUG_TRACE: "true"
+#   CI_PROJECT_URL: "http://172.26.0.51/Sh/miner-rep"
+#   CI_PROJECT_DIR: "./builds"
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+
+build:
+  stage: build
+  script:
+    - mvn $MAVEN_CLI_OPTS clean install
+
+dev_front2:
+  stage: DEV deploy
+  script:
+    - mvn $MAVEN_CLI_OPTS clean install -P dev
+    - ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@172.26.0.53 'rm -rf /opt/tomcat/latest/webapps/ROOT.war'
+    - scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./target/miner-cabinet-0.0.1-SNAPSHOT.war root@172.26.0.53:/opt/tomcat/latest
+    - ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@172.26.0.53 'chown tomcat:tomcat /opt/tomcat/latest/miner-cabinet-0.0.1-SNAPSHOT.war'
+    - ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@172.26.0.53 'mv /opt/tomcat/latest/miner-cabinet-0.0.1-SNAPSHOT.war /opt/tomcat/latest/webapps/ROOT.war'
+  when: manual
+  environment:
+      name: dev_front2
+      url: http://psuback.lineapps.org
+
